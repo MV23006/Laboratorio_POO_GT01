@@ -1,7 +1,6 @@
 package org.laboratorio2;
 
 import com.google.gson.*;
-import org.laboratorio2.config.ConfiguracionFlota;
 import org.laboratorio2.dto.ResumenFlotaDTO;
 import org.laboratorio2.model.Vehiculo;
 import org.laboratorio2.model.VehiculoCarga;
@@ -11,36 +10,54 @@ import org.laboratorio2.service.RepositorioGenerico;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GestorFlota implements RepositorioGenerico<Vehiculo> {
+
     private List<Vehiculo> listaVehiculos = new ArrayList<>();
+
+    private static Vehiculo deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+        JsonObject jsonObject = json.getAsJsonObject();
+
+        // Busca primero 'tipoVehiculo' y si no existe busca 'tipo'
+        JsonElement tipoElem = jsonObject.get("tipoVehiculo");
+        if (tipoElem == null) {
+            tipoElem = jsonObject.get("tipo");
+        }
+
+        if (tipoElem == null) {
+            throw new JsonParseException("Campo tipoVehiculo no encontrado en el JSON");
+        }
+
+        String tipo = tipoElem.getAsString();
+        if ("VehiculoCarga".equalsIgnoreCase(tipo)) {
+            return context.deserialize(jsonObject, VehiculoCarga.class);
+        } else if ("VehiculoPasajeros".equalsIgnoreCase(tipo) || "VehiculoPasajero".equalsIgnoreCase(tipo)) {
+            return context.deserialize(jsonObject, VehiculoPasajeros.class);
+        }
+
+        throw new JsonParseException("Tipo de vehiculo desconocido: " + tipo);
+    }
 
     private Gson crearGson() {
         JsonSerializer<Vehiculo> serializer = (src, typeOfSrc, context) -> {
-            JsonObject jsonObj = context.serialize(src).getAsJsonObject();
+            JsonObject jsonObj = new JsonObject();
             jsonObj.addProperty("tipoVehiculo", src.getClass().getSimpleName());
+            jsonObj.addProperty("id", src.getId());
+            jsonObj.addProperty("placa", src.getPlaca());
+            jsonObj.addProperty("costoBase", src.getCostoBase());
+
+            if (src instanceof VehiculoCarga carga) {
+                jsonObj.addProperty("capacidadToneladas", carga.getCapacidadToneladas());
+            } else if (src instanceof VehiculoPasajeros pasajeros) {
+                jsonObj.addProperty("numPasajeros", pasajeros.getNumPasajeros());
+            }
             return jsonObj;
         };
 
-        JsonDeserializer<Vehiculo> deserializer = (json, typeOfT, context) -> {
-            JsonObject jsonObject = json.getAsJsonObject();
-            JsonElement tipoElem = jsonObject.get("tipoVehiculo");
-
-            if (tipoElem == null) {
-                throw new JsonParseException("Campo tipoVehiculo no encontrado en el JSON");
-            }
-
-            String tipo = tipoElem.getAsString();
-            if ("VehiculoCarga".equalsIgnoreCase(tipo)) {
-                return context.deserialize(jsonObject, VehiculoCarga.class);
-            } else if ("VehiculoPasajero".equalsIgnoreCase(tipo) || "VehiculoPasajeros".equalsIgnoreCase(tipo)) {
-                return context.deserialize(jsonObject, VehiculoPasajeros.class);
-            }
-            throw new JsonParseException("Tipo de vehiculo desconocido: " + tipo);
-        };
-
+        JsonDeserializer<Vehiculo> deserializer = GestorFlota::deserialize;
         return new GsonBuilder()
                 .registerTypeAdapter(Vehiculo.class, serializer)
                 .registerTypeAdapter(Vehiculo.class, deserializer)
@@ -68,32 +85,39 @@ public class GestorFlota implements RepositorioGenerico<Vehiculo> {
         }
     }
 
+    /**
+     * @param ruta
+     */
     @Override
     public void cargarDesdeJSON(String ruta) {
         Gson gson = crearGson();
         try (FileReader reader = new FileReader(ruta)) {
             JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
-            listaVehiculos.clear();
+
             for (JsonElement element : jsonArray) {
                 Vehiculo vehiculo = gson.fromJson(element, Vehiculo.class);
-                listaVehiculos.add(vehiculo);
+                if (vehiculo != null) listaVehiculos.add(vehiculo);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public ResumenFlotaDTO generarReporte() {
-        int totalVehiculos = listaVehiculos.size();
-        double costoTotalMantenimiento = 0.0;
+public ResumenFlotaDTO generarReporte() {
+    int total = (listaVehiculos != null) ? listaVehiculos.size() : 0;
+    double costoMantenimiento = 0.0;
+    double impuestoTotal = 0.0;
 
+    if (listaVehiculos != null) {
         for (Vehiculo v : listaVehiculos) {
-            costoTotalMantenimiento += v.calcularCostoMantenimiento();
+            if (v != null) {
+                costoMantenimiento += v.calcularCostoMantenimiento();
+                impuestoTotal += v.calcularImpuesto();
+            }
         }
-
-        double tasaImpuesto = ConfiguracionFlota.getInstance().getTasaImpuesto();
-        double impuestoTotal = costoTotalMantenimiento * tasaImpuesto;
-
-        return new ResumenFlotaDTO(totalVehiculos, costoTotalMantenimiento, impuestoTotal);
     }
+
+    return new ResumenFlotaDTO(total, costoMantenimiento, impuestoTotal);
 }
+
+    }

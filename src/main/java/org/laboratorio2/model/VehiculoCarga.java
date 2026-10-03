@@ -1,7 +1,7 @@
 package org.laboratorio2.model;
 
 public class VehiculoCarga extends Vehiculo {
-    private double capacidadToneladas;
+    private final double capacidadToneladas;
 
     public VehiculoCarga(int id, String placa, double costoBase, double capacidadToneladas) {
         super(id, placa, costoBase);

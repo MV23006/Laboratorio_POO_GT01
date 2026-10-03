@@ -9,4 +9,8 @@ public class VehiculoPasajeros extends Vehiculo {
     public double calcularCostoMantenimiento() {
         return 0;
     }
+
+    public String getNumPasajeros() {
+        return "";
+    }
 }

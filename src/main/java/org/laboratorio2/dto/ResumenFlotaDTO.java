@@ -11,7 +11,6 @@ public class ResumenFlotaDTO {
         this.impuestoTotal = impuestoTotal;
     }
 
-    public int getTotalVehiculos() { return totalVehiculos; }
     public double getCostoTotalMantenimiento() { return costoTotalMantenimiento; }
     public double getImpuestoTotal() { return impuestoTotal; }
 

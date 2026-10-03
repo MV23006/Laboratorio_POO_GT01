@@ -30,5 +30,9 @@ public abstract class Vehiculo {
         Vehiculo vehiculo = (Vehiculo) obj;
         return Objects.equals(placa, vehiculo.placa);
     }
+
+    public double calcularImpuesto() {
+        return 0;
+    }
 }
 
