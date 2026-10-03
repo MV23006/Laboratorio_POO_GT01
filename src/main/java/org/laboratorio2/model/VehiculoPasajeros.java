@@ -1,7 +1,7 @@
 package org.laboratorio2.model;
 
-public class VehiculoPasajero extends Vehiculo {
-    public VehiculoPasajero(int i, String s, double v, int i1) {
+public class VehiculoPasajeros extends Vehiculo {
+    public VehiculoPasajeros(int i, String s, double v, int i1) {
         super();
     }
 

@@ -2,8 +2,8 @@ package org.laboratorio2.controller;
 
 import org.laboratorio2.dto.ResumenFlotaDTO;
 import org.laboratorio2.model.VehiculoCarga;
-import org.laboratorio2.model.VehiculoPasajero;
-import org.laboratorio2.service.GestorFlota;
+import org.laboratorio2.model.VehiculoPasajeros;
+import org.laboratorio2.GestorFlota;
 
 public class Main {
     public static void main(String[] args) {
@@ -13,8 +13,8 @@ public class Main {
         // 1. Agregar vehículos
         gestor.agregar(new VehiculoCarga(1, "C-101", 500.0, 10.0));
         gestor.agregar(new VehiculoCarga(2, "C-102", 600.0, 15.0));
-        gestor.agregar(new VehiculoPasajero(3, "P-201", 300.0, 40));
-        gestor.agregar(new VehiculoPasajero(4, "P-202", 350.0, 25));
+        gestor.agregar(new VehiculoPasajeros(3, "P-201", 300.0, 40));
+        gestor.agregar(new VehiculoPasajeros(4, "P-202", 350.0, 25));
 
         // 2. Guardar en JSON
         gestor.guardarEnJSON(archivoJson);

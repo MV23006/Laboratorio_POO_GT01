@@ -1,11 +1,12 @@
-package org.laboratorio2.service;
+package org.laboratorio2;
 
 import com.google.gson.*;
 import org.laboratorio2.config.ConfiguracionFlota;
 import org.laboratorio2.dto.ResumenFlotaDTO;
 import org.laboratorio2.model.Vehiculo;
 import org.laboratorio2.model.VehiculoCarga;
-import org.laboratorio2.model.VehiculoPasajero;
+import org.laboratorio2.model.VehiculoPasajeros;
+import org.laboratorio2.service.RepositorioGenerico;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -35,7 +36,7 @@ public class GestorFlota implements RepositorioGenerico<Vehiculo> {
             if ("VehiculoCarga".equalsIgnoreCase(tipo)) {
                 return context.deserialize(jsonObject, VehiculoCarga.class);
             } else if ("VehiculoPasajero".equalsIgnoreCase(tipo) || "VehiculoPasajeros".equalsIgnoreCase(tipo)) {
-                return context.deserialize(jsonObject, VehiculoPasajero.class);
+                return context.deserialize(jsonObject, VehiculoPasajeros.class);
             }
             throw new JsonParseException("Tipo de vehiculo desconocido: " + tipo);
         };
