@@ -1,0 +1,22 @@
+[
+  {
+    "capacidadToneladas": 10.0,
+    "id": 1,
+    "placa": "C-101",
+    "costoBase": 500.0
+  },
+  {
+    "capacidadToneladas": 15.0,
+    "id": 2,
+    "placa": "C-102",
+    "costoBase": 600.0
+  },
+  {
+    "id": 0,
+    "costoBase": 0.0
+  },
+  {
+    "id": 0,
+    "costoBase": 0.0
+  }
+]
